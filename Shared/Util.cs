@@ -11,7 +11,7 @@ namespace Test_Blazor_MLNet.Shared
     {
         public static Stream GetInductedToHallOfFameModel(string algorithmName)
         {
-            var assembly = typeof(Test_Blazor_MLNet.Shared.WeatherForecast).Assembly;
+            var assembly = typeof(Test_Blazor_MLNet.Shared.Util).Assembly;
             Stream resource = assembly.GetManifestResourceStream($"Test-Blazor-MLNet.Shared.Models.InductedToHallOfFame-{algorithmName}.mlnet");
 
             return resource;

@@ -34,7 +34,7 @@ namespace Test_Blazor_MLNet.Shared
 
             // Load MLB baseball batters from local CSV file
 
-            var assembly = typeof(Test_Blazor_MLNet.Shared.WeatherForecast).Assembly;
+            var assembly = typeof(Test_Blazor_MLNet.Shared.Util).Assembly;
 
             var lines = ReadLines(() => assembly.GetManifestResourceStream("Test-Blazor-MLNet.Shared.Data.MLBBaseballBatters.csv"), Encoding.UTF8)
             .ToList();

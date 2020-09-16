@@ -1,7 +1,7 @@
 ﻿using Microsoft.ML.Data;
 using System;
 
-namespace Test_Blazor_MLNet
+namespace Test_Blazor_MLNet.Shared
 {
     public class MLBBaseballBatter
     {
