@@ -5,6 +5,7 @@
     <RootNamespace>Test-Blazor-MLNet.Server</RootNamespace>
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>
+    <UserSecretsId>1dcd843c-1415-4a8a-b3b0-245c8eab2329</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
