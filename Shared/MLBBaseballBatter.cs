@@ -196,4 +196,18 @@ namespace Test_Blazor_MLNet.Shared
         [ColumnName("Score")]
         public float Score { get; set; }
     }
+    public class MLBBaseballBatterSeasonPrediction
+    {
+        public bool InductedToHallOfFamePrediction { get; set; }
+
+        public double InductedToHallOfFameProbability { get; set; }
+
+        public bool OnHallOfFameBallotPrediction { get; set; }
+
+        public double OnHallOfFameBallotProbability { get; set; }
+
+        public string FullPlayerName { get; set; }
+
+        public int SeasonNumber { get; set; }
+    }
 }
