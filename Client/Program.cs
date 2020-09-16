@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Test_Blazor_MLNet.Shared;
 
 namespace Test_Blazor_MLNet.Client
 {
@@ -18,6 +19,8 @@ namespace Test_Blazor_MLNet.Client
             builder.RootComponents.Add<App>("#app");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+            builder.Services.AddSingleton<BaseballDataSampleService>();
 
             await builder.Build().RunAsync();
         }

@@ -5,11 +5,39 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\MLBBaseballBatters.csv" />
+    <None Remove="Models\InductedToHallOfFame-AveragedPerceptron.mlnet" />
+    <None Remove="Models\InductedToHallOfFame-FastForest.mlnet" />
+    <None Remove="Models\InductedToHallOfFame-FastTree.mlnet" />
+    <None Remove="Models\InductedToHallOfFame-FieldAwareFactorization.mlnet" />
+    <None Remove="Models\InductedToHallOfFame-GeneralizedAdditiveModels.mlnet" />
     <None Remove="Models\InductedToHallOfFame-LightGbm.mlnet" />
+    <None Remove="Models\InductedToHallOfFame-LinearSupportVectorMachines.mlnet" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Data\MLBBaseballBatters.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-AveragedPerceptron.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-FastForest.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-FastTree.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-FieldAwareFactorization.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-GeneralizedAdditiveModels.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Models\InductedToHallOfFame-LightGbm.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-LinearSupportVectorMachines.mlnet">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
