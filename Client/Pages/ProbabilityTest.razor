@@ -1,0 +1,112 @@
+﻿@page "/ProbabilityTest"
+@inject HttpClient _client
+
+<h1>Probability Test</h1>
+
+<p>Probability: @probability</p>
+<p>Predicted Label: @predLabel</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+@code {
+    DataViewSchema schema;
+
+    private float probability = 0;
+    private bool predLabel = false;
+
+    private PredictionEngine<MLBBaseballBatter, MLBHOFPrediction> _predictionEngine;
+
+    protected override void OnInitialized()
+    {
+        var modelStream = Test_Blazor_MLNet.Shared.Util.GetModel();
+
+        MLContext mlContext = new MLContext();
+        ITransformer _model = mlContext.Model.Load(modelStream, out schema);
+        _predictionEngine = mlContext.Model.CreatePredictionEngine<MLBBaseballBatter, MLBHOFPrediction>(_model);
+    }
+
+    private void IncrementCount()
+    {
+        var badMLBBatter = new MLBBaseballBatter
+        {
+            FullPlayerName = "Bad Player",
+            ID = 100f,
+            InductedToHallOfFame = false,
+            LastYearPlayed = 0f,
+            OnHallOfFameBallot = false,
+            YearsPlayed = 2f,
+            AB = 100f,
+            R = 10f,
+            H = 30f,
+            Doubles = 1f,
+            Triples = 1f,
+            HR = 1f,
+            RBI = 10f,
+            SB = 10f,
+            BattingAverage = 0.3f,
+            SluggingPct = 0.15f,
+            AllStarAppearances = 1f,
+            MVPs = 0f,
+            TripleCrowns = 0f,
+            GoldGloves = 0f,
+            MajorLeaguePlayerOfTheYearAwards = 0f,
+            TB = 200f
+        };
+        var averageMLBBatter = new MLBBaseballBatter
+        {
+            FullPlayerName = "Average Player",
+            ID = 100f,
+            InductedToHallOfFame = false,
+            LastYearPlayed = 0f,
+            OnHallOfFameBallot = false,
+            YearsPlayed = 2f,
+            AB = 8393f,
+            R = 1162f,
+            H = 2340f,
+            Doubles = 410f,
+            Triples = 8f,
+            HR = 439f,
+            RBI = 1412f,
+            SB = 9f,
+            BattingAverage = 0.279f,
+            SluggingPct = 0.486f,
+            AllStarAppearances = 6f,
+            MVPs = 0f,
+            TripleCrowns = 0f,
+            GoldGloves = 0f,
+            MajorLeaguePlayerOfTheYearAwards = 0f,
+            TB = 4083f
+        };
+        var greatMLBBatter = new MLBBaseballBatter
+        {
+            FullPlayerName = "Great Player",
+            ID = 100f,
+            InductedToHallOfFame = false,
+            LastYearPlayed = 0f,
+            OnHallOfFameBallot = false,
+            YearsPlayed = 20f,
+            AB = 10000f,
+            R = 1900f,
+            H = 3500f,
+            Doubles = 500f,
+            Triples = 150f,
+            HR = 600f,
+            RBI = 1800f,
+            SB = 400f,
+            BattingAverage = 0.350f,
+            SluggingPct = 0.65f,
+            AllStarAppearances = 14f,
+            MVPs = 2f,
+            TripleCrowns = 1f,
+            GoldGloves = 4f,
+            MajorLeaguePlayerOfTheYearAwards = 2f,
+            TB = 7000f
+        };
+
+        var test = _predictionEngine.Predict(badMLBBatter);
+        var test2 = _predictionEngine.Predict(greatMLBBatter);
+
+        probability = test2.Probability;
+        predLabel = test2.Prediction;
+    }
+}
