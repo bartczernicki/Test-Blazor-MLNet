@@ -13,6 +13,9 @@
     <None Remove="Models\InductedToHallOfFame-GeneralizedAdditiveModels.mlnet" />
     <None Remove="Models\InductedToHallOfFame-LightGbm.mlnet" />
     <None Remove="Models\InductedToHallOfFame-LinearSupportVectorMachines.mlnet" />
+    <None Remove="Models\InductedToHallOfFame-LogisticRegression.mlnet" />
+    <None Remove="Models\InductedToHallOfFame-StochasticGradientDescentCalibrated.mlnet" />
+    <None Remove="Models\InductedToHallOfFame-StochasticGradientDescentNonCalibrated.mlnet" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,10 +43,20 @@
     <EmbeddedResource Include="Models\InductedToHallOfFame-LinearSupportVectorMachines.mlnet">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-LogisticRegression.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-StochasticGradientDescentCalibrated.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Models\InductedToHallOfFame-StochasticGradientDescentNonCalibrated.mlnet">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ML" Version="1.5.2" />
+    <PackageReference Include="Microsoft.ML.CpuMath" Version="1.5.2" />
     <PackageReference Include="Microsoft.ML.FastTree" Version="1.5.2" />
     <PackageReference Include="Microsoft.ML.LightGbm" Version="1.5.2" />
   </ItemGroup>
