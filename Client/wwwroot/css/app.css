@@ -48,3 +48,58 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+
+h5 {
+    font-size: 14px;
+    line-height: 20px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-family: Helvetica, Arial;
+    color: #333;
+}
+
+.g-prediction-row {
+    color: #000;
+    background: hsl(204, 26%, 94%);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Helvetica, Arial;
+    font-size: 12px;
+    line-height: 24px;
+    color: #999;
+    border-top: solid 1px #dedede;
+    margin-bottom: 20px;
+}
+
+.g-prediction-true {
+    font-weight: bold;
+    color: black;
+    font-size: 12px;
+    line-height: 12px;
+}
+
+td {
+    padding: 0 4px 0 8px;
+    border-bottom: solid 1px #dedede;
+}
+
+/*https://archive.nytimes.com/www.nytimes.com/interactive/2013/03/29/sports/baseball/Strikeouts-Are-Still-Soaring.html?ref=baseball*/
+
+.g-predictionTable {
+    width: 300px;
+    float: left;
+    margin-left: 30px;
+}
+
+.g-seasonNumber {
+    width: 125px;
+}
+
+.g-prediction {
+    width: 100px;
+}

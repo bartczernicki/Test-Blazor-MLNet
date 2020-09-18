@@ -202,9 +202,13 @@ namespace Test_Blazor_MLNet.Shared
 
         public double InductedToHallOfFameProbability { get; set; }
 
+        public string InductedToHallOfFameProbabilityLabel { get; set; }
+
         public bool OnHallOfFameBallotPrediction { get; set; }
 
         public double OnHallOfFameBallotProbability { get; set; }
+
+        public string OnHallOfFameBallotProbabilityLabel { get; set; }
 
         public string FullPlayerName { get; set; }
 
