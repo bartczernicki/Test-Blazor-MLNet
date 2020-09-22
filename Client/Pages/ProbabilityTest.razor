@@ -1,10 +1,11 @@
 ﻿@page "/ProbabilityTest"
 @inject BaseballDataSampleService BaseballDataService
+@inject IJSRuntime JSRuntime
+
 
 <strong class="form-text">Local prediction inference in Blazor and ML.NET</strong>
-<br />
-
 <small class="form-text text-muted"><b>Select </b> the algorithm used in the ML.NET model for prediction:</small>
+<small class="form-text text-muted"><b>Note: </b>Models that do not return probability vlaues (only labels) will show value as N/A</small>
 <select id="algorithmName" @onchange="OnSelectedAlgorithm">
     <option value="AveragedPerceptron">AveragedPerceptron</option>
     <option value="FastForest">FastForest</option>
@@ -15,19 +16,18 @@
     <option value="StackedEnsemble">Stacked Ensemble</option>
     <option value="StochasticGradientDescentCalibrated">StochasticGradientDescentCalibrated</option>
     <option value="StochasticGradientDescentNonCalibrated">StochasticGradientDescentNonCalibrated</option>
-    @*<option value="LinearSupportVectorMachines">LinearSupportVectorMachines</option>*@
 </select>
 
 <small class="form-text text-muted"><b>Select or Search</b> any MLB Batter to perform prediction:</small>
 <BlazoredTypeahead SearchMethod="@SearchBaseballPlayers"
                    @bind-Value="@SelectedBatter"
-                   Debounce="150" MaximumSuggestions="25"
+                   Debounce="150" MaximumSuggestions="50"
                    EnableDropDown="true" ShowDropDownOnFocus="true">
     <SelectedTemplate>
-        <b>@context.FullPlayerName - &nbsp;</b> (Years Played: @context.YearsPlayed, Last Season Played: @context.LastYearPlayed-@(context.LastYearPlayed+1))
+        <b>@context.FullPlayerName - &nbsp;</b> (Years Played: @context.YearsPlayed, Last Season Played: @context.LastYearPlayed-@(context.LastYearPlayed + 1))
     </SelectedTemplate>
     <ResultTemplate>
-        <b>@context.FullPlayerName - &nbsp;</b> (Years Played: @context.YearsPlayed, Last Season Played: @context.LastYearPlayed-@(context.LastYearPlayed+1))
+        <b>@context.FullPlayerName - &nbsp;</b> (Years Played: @context.YearsPlayed, Last Season Played: @context.LastYearPlayed-@(context.LastYearPlayed + 1))
     </ResultTemplate>
     <NotFoundTemplate>
         Sorry, there weren't any baseball players found.
@@ -35,7 +35,6 @@
 </BlazoredTypeahead>
 
 <br />
-
 <div class="g-predictionTable">
     <h5>Hall of Fame - On Ballot</h5>
     <table>
@@ -46,7 +45,7 @@
                 <th>Class Label</th>
             </tr>
         </thead>
-        @foreach (var pred in batterSeasonPredictions)
+        @foreach (var pred in this.predictionData.MLBBaseballBatterSeasonPredictions)
         {
             <tr class=@(pred.OnHallOfFameBallotPrediction ? "g-prediction-row" : string.Empty)>
                 <td class="g-seasonNumber">@pred.SeasonNumber</td>
@@ -66,7 +65,7 @@
                 <th>Class Label</th>
             </tr>
         </thead>
-        @foreach (var pred in batterSeasonPredictions)
+        @foreach (var pred in this.predictionData.MLBBaseballBatterSeasonPredictions)
         {
             <tr class=@(pred.InductedToHallOfFamePrediction ? "g-prediction-row" : string.Empty)>
                 <td class="g-seasonNumber">@pred.SeasonNumber</td>
@@ -77,11 +76,19 @@
     </table>
 </div>
 
+<div class="g-predictionChart">
+    <h5>Predictions - Historical Seasons</h5>
+    <!-- Create a div where the graph will take place -->
+    <div id="my_dataviz" style="clear: both;">
+    </div>
+</div>
 
 @code {
 
-    public List<MLBBaseballBatter> batters;
-    public List<MLBBaseballBatterSeasonPrediction> batterSeasonPredictions;
+    public List<MLBBaseballBatter> batters = new List<MLBBaseballBatter>(27000);
+    public List<MLBBaseballBatter> battersLastYear;
+    public PredictionData predictionData;
+    private List<PredictionChartData> predictionChartData;
     private MLBBaseballBatter _selectedBatter;
     private string selectedAlgorithm = "LightGbm"; //default
     private string[] predictionTypes = { "InductedToHallOfFame", "OnHallOfFameBallot" };
@@ -104,9 +111,18 @@
         // Build baseball batters list
         batters = await BaseballDataService.GetSampleBaseballData();
 
-        this.SelectedBatter = batters.Where(a => a.FullPlayerName == MLBBaseballBatter.GetDefaultBatter()).FirstOrDefault();
+        this.battersLastYear = batters
+          .OrderByDescending(a => a.YearsPlayed)
+          .GroupBy(a => a.ID)
+          .Select(g => g.First()).ToList();
+
+        this.SelectedBatter = battersLastYear.Where(a => a.FullPlayerName == MLBBaseballBatter.GetDefaultBatter()).FirstOrDefault();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await this.RenderChart();
+    }
 
     void OnSelectedAlgorithm(ChangeEventArgs e)
     {
@@ -118,11 +134,22 @@
 
     private async Task<IEnumerable<MLBBaseballBatter>> SearchBaseballPlayers(string searchText)
     {
-        return await Task.FromResult(batters.Where(x => x.FullPlayerName.ToLower().Contains(searchText.ToLower())).ToList());
+        return await Task.FromResult(battersLastYear.Where(x => x.FullPlayerName.ToLower().Contains(searchText.ToLower())).ToList());
     }
 
     private void PerformPrediction()
     {
-        batterSeasonPredictions = Util.GetMLBBaseballBatterSeasonPredictions(selectedAlgorithm, SelectedBatter);
+        var selectedBatterSeasons = batters.Where(b => b.ID == this.SelectedBatter.ID).ToList();
+        this.predictionData = Util.GetMLBBaseballBatterSeasonPredictions(selectedAlgorithm, SelectedBatter, selectedBatterSeasons);
+    }
+
+    private async Task RenderChart()
+    {
+        if (this.predictionData.ChartData == null)
+        {
+            this.PerformPrediction();
+        }
+
+        await JSRuntime.InvokeVoidAsync("createD3SvgObject", this.predictionData.ChartData, this.predictionData.ChartDataMinMax, selectedAlgorithm);
     }
 }
