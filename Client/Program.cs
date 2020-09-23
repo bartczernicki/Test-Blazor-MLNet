@@ -20,8 +20,6 @@ namespace Test_Blazor_MLNet.Client
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-            builder.Services.AddSingleton<BaseballDataSampleService>();
-
             await builder.Build().RunAsync();
         }
     }
