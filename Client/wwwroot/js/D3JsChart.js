@@ -18,8 +18,11 @@
     // Set max seasons played (max range)
     var maxSeasonPlayed = d3.max(dataArray, d => d[1].seasonPlayed);
 
+    // Get max probability in array, if 0 then it is an algorithm that doesn't return probabilities
+    var maxProbability = d3.max(dataMinMaxArray, d => d[1].max);
+
     // If there is a valid data array, proceed to draw the SVG chart
-    if (dataArray.length > 9) {
+    if (maxProbability > 0) {
         // DRAW D3 CHART - SVG
 
         // 1) Set up chart canvas
