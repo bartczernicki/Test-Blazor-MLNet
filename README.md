@@ -1,4 +1,4 @@
-**Test-Blazor-MLNet*
+**Test-Blazor-MLNet**
 is a test Blazor WASM and .NET 5 application that shows howto perform Machine Learning .NET inference locally inside the browser.
 
 **Live Demo Web Site:** https://test-blazor-mlnet.azurewebsites.net/
