@@ -52,7 +52,10 @@ namespace Test_Blazor_MLNet.Server
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapFallbackToFile("index.html");
+
+                // Removed & Added for Blazor pre-rendering
+                //endpoints.MapFallbackToFile("index.html");
+                endpoints.MapFallbackToPage("/_Host");
             });
         }
     }
