@@ -1,6 +1,7 @@
-﻿@page "/ProbabilityTest"
+﻿@page "/HallOfFameBattingPredictions"
 @inject IJSRuntime JSRuntime
 
+<link href="_content/Blazored.Typeahead/blazored-typeahead.css" rel="stylesheet" />
 
 <strong class="form-text">Local prediction inference in Blazor and ML.NET</strong>
 <small class="form-text text-muted"><b>Select </b>the algorithm used in the ML.NET model for prediction:</small>
@@ -56,11 +57,11 @@
                 </thead>
                 @foreach (var pred in this.predictionData.MLBBaseballBatterSeasonPredictions)
                 {
-                <tr class=@(pred.OnHallOfFameBallotPrediction ? "g-prediction-row" : string.Empty)>
-                    <td class="g-seasonNumber">@pred.SeasonNumber</td>
-                    <td>@pred.OnHallOfFameBallotProbabilityLabel</td>
-                    <td class="g-prediction"><div class=@(pred.OnHallOfFameBallotPrediction ? "g-prediction-true" : string.Empty)>@pred.OnHallOfFameBallotPrediction</div></td>
-                </tr>
+                    <tr class=@(pred.OnHallOfFameBallotPrediction ? "g-prediction-row" : string.Empty)>
+                        <td class="g-seasonNumber">@pred.SeasonNumber</td>
+                        <td>@pred.OnHallOfFameBallotProbabilityLabel</td>
+                        <td class="g-prediction"><div class=@(pred.OnHallOfFameBallotPrediction ? "g-prediction-true" : string.Empty)>@pred.OnHallOfFameBallotPrediction</div></td>
+                    </tr>
                 }
             </table>
         </div>
@@ -76,11 +77,11 @@
                 </thead>
                 @foreach (var pred in this.predictionData.MLBBaseballBatterSeasonPredictions)
                 {
-                <tr class=@(pred.InductedToHallOfFamePrediction ? "g-prediction-row" : string.Empty)>
-                    <td class="g-seasonNumber">@pred.SeasonNumber</td>
-                    <td>@pred.InductedToHallOfFameProbabilityLabel</td>
-                    <td class="g-prediction"><div class=@(pred.InductedToHallOfFamePrediction ? "g-prediction-true" : string.Empty)>@pred.InductedToHallOfFamePrediction</div></td>
-                </tr>
+                    <tr class=@(pred.InductedToHallOfFamePrediction ? "g-prediction-row" : string.Empty)>
+                        <td class="g-seasonNumber">@pred.SeasonNumber</td>
+                        <td>@pred.InductedToHallOfFameProbabilityLabel</td>
+                        <td class="g-prediction"><div class=@(pred.InductedToHallOfFamePrediction ? "g-prediction-true" : string.Empty)>@pred.InductedToHallOfFamePrediction</div></td>
+                    </tr>
                 }
             </table>
         </div>
