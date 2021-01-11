@@ -56,7 +56,7 @@ namespace Test_Blazor_MLNet.Shared
 
             var assembly = typeof(Test_Blazor_MLNet.Shared.Util).Assembly;
 
-            var lines = ReadLines(() => Util.GetBaseballData(), Encoding.UTF8);
+            var lines = ReadLines(() => Util.GetBaseballDataStream(), Encoding.UTF8);
 
             var batters = lines
                         .Skip(1)

@@ -9,9 +9,27 @@ namespace Test_Blazor_MLNet.Shared
     public class Util
     {
         private static MLContext mlContext = new MLContext();
+        private static Dictionary<string, ITransformer> _itransfomerModels = new Dictionary<string, ITransformer>();
         private static Dictionary<string, PredictionEngine<MLBBaseballBatter, MLBHOFPrediction>> _predictionEngines = new Dictionary<string, PredictionEngine<MLBBaseballBatter, MLBHOFPrediction>>();
 
-        public static Stream GetModel(string predictionType, string algorithmName)
+        public static ITransformer GetModel(MLContext mlContext, string predictionType, string algorithmName)
+        {
+            var _transformerModelKey = $"{predictionType}-{algorithmName}";
+            ITransformer transformerModel;
+
+            if (!_itransfomerModels.TryGetValue(_transformerModelKey, out transformerModel))
+            {
+                DataViewSchema schema;
+                var modelStream = Util.GetModelStream(predictionType, algorithmName);
+                transformerModel = mlContext.Model.Load(modelStream, out schema);
+
+                _itransfomerModels.Add(_transformerModelKey, transformerModel);
+            }
+
+            return transformerModel;
+        }
+
+        public static Stream GetModelStream(string predictionType, string algorithmName)
         {
             var assembly = typeof(Test_Blazor_MLNet.Shared.Util).Assembly;
             Stream resource = assembly.GetManifestResourceStream($"Test-Blazor-MLNet.Shared.Models.{predictionType}-{algorithmName}.mlnet");
@@ -19,7 +37,7 @@ namespace Test_Blazor_MLNet.Shared
             return resource;
         }
 
-        public static Stream GetBaseballData()
+        public static Stream GetBaseballDataStream()
         {
             var assembly = typeof(Test_Blazor_MLNet.Shared.Util).Assembly;
 
@@ -39,7 +57,7 @@ namespace Test_Blazor_MLNet.Shared
             if (!_predictionEngines.TryGetValue(_predictionEngineKey, out _predictionEngine))
             {
                 DataViewSchema schema;
-                var modelStream = Util.GetModel(predictionType, algorithmName);
+                var modelStream = Util.GetModelStream(predictionType, algorithmName);
                 ITransformer _model = mlContext.Model.Load(modelStream, out schema);
 
                 _predictionEngine = mlContext.Model.CreatePredictionEngine<MLBBaseballBatter, MLBHOFPrediction>(_model);
@@ -59,39 +77,6 @@ namespace Test_Blazor_MLNet.Shared
 
             var mlbBaseballBatterSeasonPredictions = new List<MLBBaseballBatterSeasonPrediction>();
 
-            //if (algorithmName != "StackedEnsemble")
-            //{
-            //    PredictionEngine<MLBBaseballBatter, MLBHOFPrediction> _predictionEngineInductedToHallOfFame =
-            //        Util.GetPredictionEngine(mlContext, "InductedToHallOfFame", algorithmName);
-            //    PredictionEngine<MLBBaseballBatter, MLBHOFPrediction> _predictionEngineOnHallOfFameBallot =
-            //        Util.GetPredictionEngine(mlContext, "OnHallOfFameBallot", algorithmName);
-
-            //    for (int i = 0; i != mLBBaseballBatter.YearsPlayed; i++)
-            //    {
-            //        var season = i + 1;
-            //        var batterSeason = selectedBatterSeasons.Where(s => Convert.ToInt32(s.YearsPlayed) == season).First();
-            //        var onHallOfFameBallotPrediction = _predictionEngineOnHallOfFameBallot.Predict(batterSeason);
-            //        var inductedToHallOfFamePrediction = _predictionEngineInductedToHallOfFame.Predict(batterSeason);
-
-            //        var seasonPrediction = new MLBBaseballBatterSeasonPrediction
-            //        {
-            //            SeasonNumber = season,
-            //            FullPlayerName = mLBBaseballBatter.FullPlayerName,
-            //            InductedToHallOfFamePrediction = inductedToHallOfFamePrediction.Prediction,
-            //            InductedToHallOfFameProbability = Math.Round(inductedToHallOfFamePrediction.Probability, 5, MidpointRounding.AwayFromZero),
-            //            OnHallOfFameBallotPrediction = onHallOfFameBallotPrediction.Prediction,
-            //            OnHallOfFameBallotProbability = Math.Round(onHallOfFameBallotPrediction.Probability, 5, MidpointRounding.AwayFromZero)
-            //        };
-
-            //        seasonPrediction.InductedToHallOfFameProbabilityLabel = (seasonPrediction.InductedToHallOfFameProbability == 0f) ? "N/A" : seasonPrediction.InductedToHallOfFameProbability.ToString();
-            //        seasonPrediction.OnHallOfFameBallotProbabilityLabel = (seasonPrediction.OnHallOfFameBallotProbability == 0f) ? "N/A" : seasonPrediction.OnHallOfFameBallotProbability.ToString();
-
-
-            //        mlbBaseballBatterSeasonPredictions.Add(seasonPrediction);
-            //    }
-            //}
-            //else
-            //{
             var chartData = new List<PredictionChartData>();
 
             var algorithNamesForEnsemble = new List<string> { "FastTree", "GeneralizedAdditiveModels", "LightGbm",
@@ -120,6 +105,11 @@ namespace Test_Blazor_MLNet.Shared
                         Util.GetPredictionEngine(mlContext, "InductedToHallOfFame", algorithmNameEnsemble);
                     PredictionEngine<MLBBaseballBatter, MLBHOFPrediction> _predictionEngineOnHallOfFameBallotEnsemble =
                         Util.GetPredictionEngine(mlContext, "OnHallOfFameBallot", algorithmNameEnsemble);
+
+                    // Note: Cannot do this in Blazor client-side, Transform method starts multiple threads which is not supported
+                    //var modelTest = Util.GetModel(mlContext, "OnHallOfFameBallot", algorithmNameEnsemble);
+                    //var seasonsView = mlContext.Data.LoadFromEnumerable(selectedBatterSeasons);
+                    //var preview = modelTest.Transform(seasonsView).Preview();
 
                     var onHallOfFameBallotPredictionEnsemble = _predictionEngineOnHallOfFameBallotEnsemble.Predict(batterSeason);
                     var inductedToHallOfFamePredictionEnsemble = _predictionEngineInductedToHallOfFameEnsemble.Predict(batterSeason);
