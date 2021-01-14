@@ -19,7 +19,7 @@
 </select>
 
 <small class="form-text text-muted"><b>Select or Search</b> any MLB Batter to perform prediction:</small>
-<BlazoredTypeahead SearchMethod="@SearchBaseballPlayers"
+<BlazoredTypeahead SearchMethod="@SearchBaseballPlayersInLuceneAsync"
                    @bind-Value="@SelectedBatter"
                    Debounce="150" MaximumSuggestions="50"
                    EnableDropDown="true" ShowDropDownOnFocus="true">
@@ -123,6 +123,16 @@
     private string selectedAlgorithm = "LightGbm"; //default
     private string[] predictionTypes = { "InductedToHallOfFame", "OnHallOfFameBallot" };
 
+    // Lucene
+    private DirectoryReader indexReader;
+    private IndexSearcher searcher;
+
+    StandardAnalyzer analyzer = new StandardAnalyzer(Lucene.Net.Util.LuceneVersion.LUCENE_48);
+
+    NumericRangeQuery<int> queryRangedMaxRecords = NumericRangeQuery.NewInt32Range("IsBatterMaxYearsRecord", 1, 1, true, true);
+    NumericRangeQuery<float> queryRangedLongerYearsRecords = NumericRangeQuery.NewSingleRange("YearsPlayed", 21f, 30f, true, true);
+
+
     public MLBBaseballBatter SelectedBatter
     {
         get { return _selectedBatter; }
@@ -131,7 +141,7 @@
             if (value != null)
             {
                 _selectedBatter = value;
-                Console.WriteLine("Selected Batter: " + _selectedBatter.FullPlayerName);
+                Console.WriteLine("SelectedBatter - " + _selectedBatter.FullPlayerName);
                 this.PerformPrediction();
             }
         }
@@ -139,6 +149,16 @@
 
     protected override void OnInitialized()
     {
+        // Unpack Lucene Index (Zip -> Current Directory)
+        Util.LoadLuceneIndexIntoDirectory();
+
+        var zipDirectory = FSDirectory.Open(Environment.CurrentDirectory);
+        Console.WriteLine("OnInitialized - Open Index Dir");
+
+        this.indexReader = DirectoryReader.Open(zipDirectory);
+        this.searcher = new IndexSearcher(indexReader);
+        Console.WriteLine("OnInitialized - Current Count of Index Docs: " + indexReader.NumDocs);
+
         // Build baseball batters list
 
         batters = BaseballDataSampleService.Instance.SampleBaseBallData;
@@ -164,9 +184,46 @@
         this.PerformPrediction();
     }
 
-    private async Task<IEnumerable<MLBBaseballBatter>> SearchBaseballPlayers(string searchText)
+    private async Task<IEnumerable<MLBBaseballBatter>> SearchBaseballPlayersInLuceneAsync(string searchText)
     {
-        return await Task.FromResult(battersLastYear.Where(x => x.FullPlayerName.ToLower().Contains(searchText.ToLower())).ToList());
+        var baseBallPlayers = new List<MLBBaseballBatter>();
+
+        BooleanQuery andQuery = new BooleanQuery();
+
+        if (String.IsNullOrEmpty(searchText))
+        {
+            andQuery.Add(queryRangedMaxRecords, Occur.MUST);
+            andQuery.Add(queryRangedLongerYearsRecords, Occur.MUST);
+        }
+        else
+        {
+            QueryParser fullPlayerNameParser = new QueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, "FullPlayerName", analyzer);
+            var query = fullPlayerNameParser.Parse(searchText + "*");
+
+            andQuery.Add(queryRangedMaxRecords, Occur.MUST);
+            andQuery.Add(query, Occur.MUST);
+        }
+
+        var searchResults = searcher.Search(andQuery, 50);
+        var hits = searchResults.ScoreDocs;
+
+        foreach (var hit in hits)
+        {
+            var foundDoc = searcher.Doc(hit.Doc);
+
+            var id = foundDoc.GetField("Id").GetStringValue();
+            var yearsPlayed = foundDoc.GetField("YearsPlayed").GetSingleValue();
+            var name = foundDoc.GetField("FullPlayerName").GetStringValue();
+            var lastYearPlayed = foundDoc.GetField("LastYearPlayed").GetSingleValue();
+
+            var player = new MLBBaseballBatter {
+                ID = id,
+                FullPlayerName = name, YearsPlayed = (int)yearsPlayed, LastYearPlayed = (int)lastYearPlayed };
+            baseBallPlayers.Add(player);
+        }
+
+        baseBallPlayers = baseBallPlayers.OrderByDescending(a => a.YearsPlayed).Select(a => a).ToList();
+        return await Task.FromResult(baseBallPlayers);
     }
 
     private void ChangeButtonAppearance(MouseEventArgs e)
@@ -199,5 +256,15 @@
         }
 
         await JSRuntime.InvokeVoidAsync("createD3SvgObject", this.predictionData.ChartData, this.predictionData.ChartDataMinMax, selectedAlgorithm);
+    }
+
+    /// <summary>
+    ///  Depracated in favor of much faster Lucene Index Search
+    /// </summary>
+    /// <param name="searchText"></param>
+    /// <returns></returns>
+    private async Task<IEnumerable<MLBBaseballBatter>> SearchBaseballPlayers(string searchText)
+    {
+        return await Task.FromResult(battersLastYear.Where(x => x.FullPlayerName.ToLower().Contains(searchText.ToLower())).ToList());
     }
 }

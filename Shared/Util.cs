@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using Lucene.Net;
 
 namespace Test_Blazor_MLNet.Shared
 {
@@ -231,6 +233,27 @@ namespace Test_Blazor_MLNet.Shared
             predictionData.MLBBaseballBatterSeasonPredictions = mlbBaseballBatterSeasonPredictions;
 
             return predictionData;
+        }
+
+        public static void LoadLuceneIndexIntoDirectory()
+        {
+            var assembly = typeof(Test_Blazor_MLNet.Shared.Util).Assembly;
+            // var resources = assembly.GetManifestResourceNames();
+
+            Stream resource = assembly.GetManifestResourceStream($"Test-Blazor-MLNet.Shared.LuceneIndex.LuceneIndex.zip");
+            Console.WriteLine("LoadLuceneIndexIntoDirectory - Retrieved Stream");
+
+            var indexPath = Path.Combine(Environment.CurrentDirectory, "LuceneIndex.zip");
+            Console.WriteLine("LoadLuceneIndexIntoDirectory - Retrieved Stream");
+
+            var fileStream = File.Create(indexPath);
+            Console.WriteLine("LoadLuceneIndexIntoDirectory - Created file stream");
+
+            resource.CopyTo(fileStream);
+            Console.WriteLine("LoadLuceneIndexIntoDirectory - Copied To Stream");
+
+            ZipFile.ExtractToDirectory(indexPath, Environment.CurrentDirectory, true);
+            Console.WriteLine("LoadLuceneIndexIntoDirectory - Extracted index to Current Directory: " + Environment.CurrentDirectory);
         }
     }
 }
