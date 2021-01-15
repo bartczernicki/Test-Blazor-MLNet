@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using Lucene.Net;
+using Lucene.Net.Documents;
 
 namespace Test_Blazor_MLNet.Shared
 {
@@ -254,6 +255,36 @@ namespace Test_Blazor_MLNet.Shared
 
             ZipFile.ExtractToDirectory(indexPath, Environment.CurrentDirectory, true);
             Console.WriteLine("LoadLuceneIndexIntoDirectory - Extracted index to Current Directory: " + Environment.CurrentDirectory);
+        }
+
+        public static MLBBaseballBatter GetBaseballBatterFromDocument(Document document)
+        {
+            var mlbBaseballBatter = new MLBBaseballBatter
+            {
+                ID = document.GetField("Id").GetStringValue(),
+                FullPlayerName = document.GetField("FullPlayerName").GetStringValue(),
+                YearsPlayed = (float) document.GetField("YearsPlayed").GetSingleValue(),
+                AB = (float)document.GetField("AB").GetSingleValue(),
+                R = (float)document.GetField("R").GetSingleValue(),
+                H = (float)document.GetField("H").GetSingleValue(),
+                Doubles = (float)document.GetField("Doubles").GetSingleValue(),
+                Triples = (float)document.GetField("Triples").GetSingleValue(),
+                HR = (float)document.GetField("HR").GetSingleValue(),
+                RBI = (float)document.GetField("RBI").GetSingleValue(),
+                SB = (float)document.GetField("SB").GetSingleValue(),
+                BattingAverage = (float)document.GetField("BattingAverage").GetSingleValue(),
+                SluggingPct = (float)document.GetField("SluggingPct").GetSingleValue(),
+                AllStarAppearances = (float)document.GetField("AllStarAppearances").GetSingleValue(),
+                MVPs = (float)document.GetField("MVPs").GetSingleValue(),
+                TripleCrowns = (float)document.GetField("TripleCrowns").GetSingleValue(),
+                GoldGloves = (float)document.GetField("GoldGloves").GetSingleValue(),
+                MajorLeaguePlayerOfTheYearAwards = (float)document.GetField("MajorLeaguePlayerOfTheYearAwards").GetSingleValue(),
+                TB = (float)document.GetField("TB").GetSingleValue(),
+                TotalPlayerAwards = (float)document.GetField("TotalPlayerAwards").GetSingleValue(),
+                LastYearPlayed = (float)document.GetField("LastYearPlayed").GetSingleValue(),
+            };
+
+            return mlbBaseballBatter;
         }
     }
 }

@@ -52,8 +52,7 @@ namespace Test_Blazor_MLNet.Shared
             // a relational database etc.
 
             // Load MLB baseball batters from local CSV file
-
-
+            
             var assembly = typeof(Test_Blazor_MLNet.Shared.Util).Assembly;
 
             var lines = ReadLines(() => Util.GetBaseballDataStream(), Encoding.UTF8);

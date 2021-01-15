@@ -161,14 +161,15 @@
 
         // Build baseball batters list
 
-        batters = BaseballDataSampleService.Instance.SampleBaseBallData;
+        //batters = BaseballDataSampleService.Instance.SampleBaseBallData;
 
-        this.battersLastYear = batters
-          .OrderByDescending(a => a.YearsPlayed)
-          .GroupBy(a => a.ID)
-          .Select(g => g.First()).ToList();
+        //this.battersLastYear = batters
+        //  .OrderByDescending(a => a.YearsPlayed)
+        //  .GroupBy(a => a.ID)
+        //  .Select(g => g.First()).ToList();
 
-        this.SelectedBatter = battersLastYear.Where(a => a.FullPlayerName == MLBBaseballBatter.GetDefaultBatter()).FirstOrDefault();
+        // Mike Trout (default)
+        this.SelectedBatter = this.GetBaseballPlayerById("troutmi01").OrderByDescending(a => a.YearsPlayed).First();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -179,7 +180,7 @@
     void OnSelectedAlgorithm(ChangeEventArgs e)
     {
         this.selectedAlgorithm = e.Value.ToString();
-        Console.WriteLine("Selected Algorithm: " + selectedAlgorithm);
+        Console.WriteLine("OnAfterRenderAsync - Selected Algorithm: " + selectedAlgorithm);
 
         this.PerformPrediction();
     }
@@ -211,19 +212,35 @@
         {
             var foundDoc = searcher.Doc(hit.Doc);
 
-            var id = foundDoc.GetField("Id").GetStringValue();
-            var yearsPlayed = foundDoc.GetField("YearsPlayed").GetSingleValue();
-            var name = foundDoc.GetField("FullPlayerName").GetStringValue();
-            var lastYearPlayed = foundDoc.GetField("LastYearPlayed").GetSingleValue();
+            var player = Util.GetBaseballBatterFromDocument(foundDoc);
 
-            var player = new MLBBaseballBatter {
-                ID = id,
-                FullPlayerName = name, YearsPlayed = (int)yearsPlayed, LastYearPlayed = (int)lastYearPlayed };
             baseBallPlayers.Add(player);
         }
 
         baseBallPlayers = baseBallPlayers.OrderByDescending(a => a.YearsPlayed).Select(a => a).ToList();
         return await Task.FromResult(baseBallPlayers);
+    }
+
+    private List<MLBBaseballBatter> GetBaseballPlayerById(string id)
+    {
+        var baseBallPlayers = new List<MLBBaseballBatter>();
+
+        var termBaseBallPlayer = new Term("Id", id);
+        var termQuery = new TermQuery(termBaseBallPlayer);
+
+        var searchResultsTermQuery = searcher.Search(termQuery, 30); /* top 30 */;
+        var hitsTermQuery = searchResultsTermQuery.ScoreDocs;
+
+        foreach (var hit in hitsTermQuery)
+        {
+            var foundDoc = searcher.Doc(hit.Doc);
+
+            var player = Util.GetBaseballBatterFromDocument(foundDoc);
+
+            baseBallPlayers.Add(player);
+        }
+
+        return baseBallPlayers;
     }
 
     private void ChangeButtonAppearance(MouseEventArgs e)
@@ -244,7 +261,9 @@
 
     private void PerformPrediction()
     {
-        var selectedBatterSeasons = batters.Where(b => b.ID == this.SelectedBatter.ID).ToList();
+        // var selectedBatterSeasons = batters.Where(b => b.ID == this.SelectedBatter.ID).ToList();
+        var selectedBatterSeasons = this.GetBaseballPlayerById(this.SelectedBatter.ID);
+
         this.predictionData = Util.GetMLBBaseballBatterSeasonPredictions(selectedAlgorithm, SelectedBatter, selectedBatterSeasons);
     }
 
