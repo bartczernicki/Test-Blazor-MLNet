@@ -110,7 +110,7 @@
 
 @code {
 
-        // Variables
+    // Variables
     private string cardDetailsStyle = "card-details-visible";
     private string cardDetailsChartStyle = "card-details-visible";
     private string button = "[ - ]";
@@ -169,7 +169,13 @@
         //  .Select(g => g.First()).ToList();
 
         // Mike Trout (default)
-        this.SelectedBatter = this.GetBaseballPlayerById("troutmi01").OrderByDescending(a => a.YearsPlayed).First();
+        this.SelectedBatter = new MLBBaseballBatter
+        {
+            ID = "troutmi01",
+            FullPlayerName = "Mike Trout",
+            YearsPlayed = 9,
+            LastYearPlayed = 2019
+        };
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -187,7 +193,7 @@
 
     private async Task<IEnumerable<MLBBaseballBatter>> SearchBaseballPlayersInLuceneAsync(string searchText)
     {
-        var baseBallPlayers = new List<MLBBaseballBatter>();
+        var baseBallPlayers = new List<MLBBaseballBatter>(50);
 
         BooleanQuery andQuery = new BooleanQuery();
 
@@ -211,7 +217,7 @@
         foreach (var hit in hits)
         {
             var foundDoc = searcher.Doc(hit.Doc);
-            var player = Util.GetBaseballBatterFromDocument(foundDoc);
+            var player = Util.GetBaseballBatterFromLuceneDocument(foundDoc);
 
             baseBallPlayers.Add(player);
         }
@@ -233,6 +239,7 @@
         var termBaseBallPlayer = new Term("Id", id);
         var termQuery = new TermQuery(termBaseBallPlayer);
 
+        // No player has more than 25 years played
         var searchResultsTermQuery = searcher.Search(termQuery, 30); /* top 30 */;
         var hitsTermQuery = searchResultsTermQuery.ScoreDocs;
 
@@ -240,7 +247,7 @@
         {
             var foundDoc = searcher.Doc(hit.Doc);
 
-            var player = Util.GetBaseballBatterFromDocument(foundDoc);
+            var player = Util.GetBaseballBatterFromLuceneDocument(foundDoc);
 
             baseBallPlayers.Add(player);
         }

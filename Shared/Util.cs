@@ -245,7 +245,7 @@ namespace Test_Blazor_MLNet.Shared
             Console.WriteLine("LoadLuceneIndexIntoDirectory - Retrieved Stream");
 
             var indexPath = Path.Combine(Environment.CurrentDirectory, "LuceneIndex.zip");
-            Console.WriteLine("LoadLuceneIndexIntoDirectory - Retrieved Stream");
+            Console.WriteLine("LoadLuceneIndexIntoDirectory - Retrieved Index");
 
             var fileStream = File.Create(indexPath);
             Console.WriteLine("LoadLuceneIndexIntoDirectory - Created file stream");
@@ -257,7 +257,7 @@ namespace Test_Blazor_MLNet.Shared
             Console.WriteLine("LoadLuceneIndexIntoDirectory - Extracted index to Current Directory: " + Environment.CurrentDirectory);
         }
 
-        public static MLBBaseballBatter GetBaseballBatterFromDocument(Document document)
+        public static MLBBaseballBatter GetBaseballBatterFromLuceneDocument(Document document)
         {
             var mlbBaseballBatter = new MLBBaseballBatter
             {

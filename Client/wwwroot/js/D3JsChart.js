@@ -5,7 +5,7 @@
     svgTest.selectAll("*").remove();
 
     //console.log(data);
-    console.log(selectedAlgorithm);
+    console.log("D3JsChart.js - " + selectedAlgorithm);
 
     // Convert set of objects to arrays
     const dataArray = Object.entries(data);
