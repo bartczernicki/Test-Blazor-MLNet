@@ -110,7 +110,7 @@
 
 @code {
 
-    // Variables
+        // Variables
     private string cardDetailsStyle = "card-details-visible";
     private string cardDetailsChartStyle = "card-details-visible";
     private string button = "[ - ]";
@@ -199,7 +199,7 @@
         else
         {
             QueryParser fullPlayerNameParser = new QueryParser(Lucene.Net.Util.LuceneVersion.LUCENE_48, "FullPlayerName", analyzer);
-            var query = fullPlayerNameParser.Parse(searchText + "*");
+            var query = fullPlayerNameParser.Parse(searchText.Trim() + "*");
 
             andQuery.Add(queryRangedMaxRecords, Occur.MUST);
             andQuery.Add(query, Occur.MUST);
@@ -211,13 +211,18 @@
         foreach (var hit in hits)
         {
             var foundDoc = searcher.Doc(hit.Doc);
-
             var player = Util.GetBaseballBatterFromDocument(foundDoc);
 
             baseBallPlayers.Add(player);
         }
 
-        baseBallPlayers = baseBallPlayers.OrderByDescending(a => a.YearsPlayed).Select(a => a).ToList();
+        // Order by years played if search term is less than 5 characters
+        // This way players with common names and higher years played show up on top of search results
+        if (searchText.Length < 5)
+        {
+            baseBallPlayers = baseBallPlayers.OrderByDescending(a => a.YearsPlayed).Select(a => a).ToList();
+        }
+
         return await Task.FromResult(baseBallPlayers);
     }
 
@@ -261,7 +266,9 @@
 
     private void PerformPrediction()
     {
+        // Old method
         // var selectedBatterSeasons = batters.Where(b => b.ID == this.SelectedBatter.ID).ToList();
+
         var selectedBatterSeasons = this.GetBaseballPlayerById(this.SelectedBatter.ID);
 
         this.predictionData = Util.GetMLBBaseballBatterSeasonPredictions(selectedAlgorithm, SelectedBatter, selectedBatterSeasons);
