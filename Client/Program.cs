@@ -22,6 +22,9 @@ namespace Test_Blazor_MLNet.Client
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+            // Add Lucene Index service (load Lucene Index from zip file and expose Directory Reader)
+            builder.Services.AddSingleton<LuceneIndexService>(LuceneIndexService.Instance);
+
             await builder.Build().RunAsync();
         }
     }
