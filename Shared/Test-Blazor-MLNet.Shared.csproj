@@ -96,10 +96,10 @@
 
   <ItemGroup>
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00013" />
-    <PackageReference Include="Microsoft.ML" Version="1.5.4" />
-    <PackageReference Include="Microsoft.ML.CpuMath" Version="1.5.4" />
-    <PackageReference Include="Microsoft.ML.FastTree" Version="1.5.4" />
-    <PackageReference Include="Microsoft.ML.LightGbm" Version="1.5.4" />
+    <PackageReference Include="Microsoft.ML" Version="1.6.0" />
+    <PackageReference Include="Microsoft.ML.CpuMath" Version="1.6.0" />
+    <PackageReference Include="Microsoft.ML.FastTree" Version="1.6.0" />
+    <PackageReference Include="Microsoft.ML.LightGbm" Version="1.6.0" />
   </ItemGroup>
 
   <ItemGroup>
