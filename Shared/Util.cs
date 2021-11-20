@@ -35,7 +35,11 @@ namespace Test_Blazor_MLNet.Shared
         public static Stream GetModelStream(string predictionType, string algorithmName)
         {
             var assembly = typeof(Test_Blazor_MLNet.Shared.Util).Assembly;
-            Stream resource = assembly.GetManifestResourceStream($"Test-Blazor-MLNet.Shared.Models.{predictionType}-{algorithmName}.mlnet");
+
+            // Map the names to new model name convention
+            var predictionTypeModelName = (predictionType == "InductedToHallOfFame") ? "InductedToHoF" : "OnHoFBallot";
+
+            Stream resource = assembly.GetManifestResourceStream($"Test-Blazor-MLNet.Shared.Models.{predictionTypeModelName}-{algorithmName}.mlnet");
 
             return resource;
         }
